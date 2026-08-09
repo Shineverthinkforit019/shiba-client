@@ -1,17 +1,13 @@
 plugins {
-    id 'fabric-loom' version '1.8.0-alpha.9'
+    id 'fabric-loom' version '1.12.5'
     id 'maven-publish'
 }
 
-version = '1.0.69'
+version = '1.0.70'
 group = 'com.example.shiba'
 
 repositories {
     mavenCentral()
-}
-
-loom {
-    disableUnpick = true
 }
 
 dependencies {
