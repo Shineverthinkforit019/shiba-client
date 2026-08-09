@@ -1,9 +1,9 @@
 plugins {
-    id 'fabric-loom' version '1.7.4'
+    id 'fabric-loom' version '1.6.1'
     id 'maven-publish'
 }
 
-version = '1.0.65'
+version = '1.0.68'
 group = 'com.example.shiba'
 
 repositories {
