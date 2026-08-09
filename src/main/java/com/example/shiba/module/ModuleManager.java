@@ -1,7 +1,6 @@
 package com.example.shiba.module;
 
 import com.example.shiba.module.impl.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +16,11 @@ public final class ModuleManager {
     public static final TriggerBot TRIGGERBOT = register(new TriggerBot());
     public static final ESP ESP = register(new ESP());
     public static final Aura AURA = register(new Aura());
+    public static final AuraX AURAX = register(new AuraX());
     public static final AimX AIMX = register(new AimX());
-    public static final MaceX MACEX = register(new MaceX());
     public static final CritX CRITX = register(new CritX());
+    public static final MaceX MACEX = register(new MaceX());
+    public static final AutoCartX AUTOCARTX = register(new AutoCartX());
 
     private ModuleManager() {}
 
@@ -40,5 +41,15 @@ public final class ModuleManager {
         for (Module m : MODULES) {
             if (m.isEnabled()) m.onTick();
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Module> T getModule(Class<T> clazz) {
+        for (Module m : MODULES) {
+            if (clazz.isInstance(m)) {
+                return (T) m;
+            }
+        }
+        return null;
     }
 }
