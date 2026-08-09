@@ -1,52 +1,40 @@
 package com.example.shiba;
 
-import com.example.shiba.config.ConfigManager;
 import com.example.shiba.gui.ClickGuiScreen;
-import com.example.shiba.module.Module;
 import com.example.shiba.module.ModuleManager;
-import com.example.shiba.module.impl.Hitbox;
-import com.example.shiba.module.impl.XrayX;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ShibaClient implements ClientModInitializer {
     public static final String MOD_ID = "shiba";
-    public static final String MOD_NAME = "Shiba";
-
-    public static KeyBinding openMenuKey;
-
-    private final Map<Module, Boolean> keyWasDown = new HashMap<>();
+    private static KeyBinding openGuiKey;
 
     @Override
     public void onInitializeClient() {
-        openMenuKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.shiba.open_menu",
+        // Đăng ký phím tắt mở GUI (sử dụng cách mới tương thích 1.21.11)
+        openGuiKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.shiba.open_gui",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_RIGHT_SHIFT,
                 "category.shiba"
         ));
+
+        // Tick event để bắt phím
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (openGuiKey != null && openGuiKey.wasPressed()) {
+                if (client.currentScreen == null) {
+                    client.setScreen(new ClickGuiScreen());
+                }
+            }
+        });
+
+        System.out.println("[Shiba] Initialized!");
+    }
+}
 
         ConfigManager.load();
 
