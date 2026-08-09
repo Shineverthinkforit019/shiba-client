@@ -3,11 +3,16 @@ plugins {
     id 'maven-publish'
 }
 
-version = '1.0.65'
+version = '1.0.67'
 group = 'com.example.shiba'
 
 repositories {
     mavenCentral()
+}
+
+loom {
+    // Tắt unpick để tránh lỗi "Unsupported unpick version"
+    disableUnpick = true
 }
 
 dependencies {
