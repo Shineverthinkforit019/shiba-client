@@ -168,9 +168,7 @@ String keyName = InputUtil.fromKeyCode(module.getKeybind(), 0).getLocalizedText(
             @Override
             protected void applyValue() {
                 setter.accept(this.value * max);
-                ConfigManager.save();
             }
-        };
         this.addDrawableChild(slider);
         return y + SLIDER_HEIGHT + SPACING;
     }
