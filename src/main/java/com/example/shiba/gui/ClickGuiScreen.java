@@ -86,7 +86,7 @@ public class ClickGuiScreen extends Screen {
     }
 
     private void drawTrailGlow(DrawContext context) {
-    private void drawTrailGlow(DrawContext context) {
+        int size = trailPoints.size();
         int size = trailPoints.size();
         if (size < 2) return;
 
