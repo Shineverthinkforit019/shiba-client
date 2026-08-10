@@ -1,6 +1,7 @@
 package com.example.shiba.mixin;
 
 import com.example.shiba.module.ModuleManager;
+import com.example.shiba.module.impl.HitSpeed;
 import com.example.shiba.module.impl.Reach;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,5 +24,23 @@ public class MixinPlayerEntity {
         if (reach == null || !reach.isEnabled()) return;
 
         cir.setReturnValue(reach.getReach());
+    }
+
+    @Inject(method = "getAttackCooldownProgress", at = @At("RETURN"), cancellable = true)
+    private void shiba$overrideCooldown(float baseTime, CallbackInfoReturnable<Float> cir) {
+        PlayerEntity self = (PlayerEntity) (Object) this;
+
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.player == null || self != mc.player) return;
+
+        HitSpeed hitSpeed = ModuleManager.HITSPEED;
+        if (hitSpeed == null || !hitSpeed.isEnabled()) return;
+
+        float multiplier = hitSpeed.getCooldownMultiplier();
+        if (multiplier >= 1.0F) return;
+
+        float original = cir.getReturnValue();
+        float boosted = Math.min(1.0F, original + (1.0F - multiplier));
+        cir.setReturnValue(boosted);
     }
 }
