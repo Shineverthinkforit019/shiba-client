@@ -12,6 +12,6 @@ public class LowFire extends Module {
     }
 
     public float getFireHeight() {
-        return isEnabled() ? fireHeight.getValue().floatValue() : 1.0f;
+        return isEnabled() ? (float) fireHeight.getValue() : 1.0f;
     }
 }
