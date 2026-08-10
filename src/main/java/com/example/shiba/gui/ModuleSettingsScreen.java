@@ -70,9 +70,8 @@ public class ModuleSettingsScreen extends Screen {
         }
 
         if (module instanceof Reach reach) {
-            y = addSlider(y, rowX, rowW, reach.reach, 20.0,
-                    v -> reach.reach = v, v -> "Reach: " + String.format("%.2f", v));
-        }
+            y = addSlider(y, rowX, rowW, reach.range, 20.0,
+    v -> reach.range.setValue(v), v -> "Range: " + String.format("%.2f", v));
 
         if (module instanceof TriggerBot tb) {
             y = addSlider(y, rowX, rowW, tb.fov, 60.0,
