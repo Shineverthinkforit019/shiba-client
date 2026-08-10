@@ -2,7 +2,6 @@ package com.example.shiba.mixin;
 
 import com.example.shiba.module.ModuleManager;
 import com.example.shiba.module.impl.HitSpeed;
-import com.example.shiba.module.impl.Reach;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,14 +17,5 @@ public class MixinPlayerEntity {
             return progress * hs.getSpeed();
         }
         return progress;
-    }
-
-    @ModifyVariable(method = "getAttackDistance", at = @At("HEAD"), argsOnly = true)
-    private float modifyAttackDistance(float distance) {
-        Reach reach = ModuleManager.REACH;
-        if (reach != null && reach.isEnabled()) {
-            return reach.getReach();
-        }
-        return distance;
     }
 }
