@@ -1,5 +1,11 @@
 package com.example.shiba.module;
 
+import com.example.shiba.module.impl.Reach;
+import com.example.shiba.module.impl.Velocity;
+import com.example.shiba.module.impl.HitSpeed;
+import com.example.shiba.module.impl.NoSlow;
+import com.example.shiba.module.impl.LowFire;
+import com.example.shiba.module.impl.MenuHider;
 import com.example.shiba.module.impl.AutoCartX;
 import com.example.shiba.module.impl.XrayX;
 import com.example.shiba.module.impl.AimX;
@@ -23,6 +29,12 @@ import java.util.List;
 public final class ModuleManager {
     private static final List<Module> MODULES = new ArrayList<>();
 
+    public static final Reach REACH = register(new Reach());
+    public static final Velocity VELOCITY = register(new Velocity());
+    public static final HitSpeed HITSPEED = register(new HitSpeed());
+    public static final NoSlow NOSLOW = register(new NoSlow());
+    public static final LowFire LOWFIRE = register(new LowFire());
+    public static final MenuHider MENUHIDER = register(new MenuHider());
     public static final AutoCartX AUTOCARTX = register(new AutoCartX());
     public static final XrayX XRAYX = register(new XrayX());
     public static final CoordsHud COORDS = register(new CoordsHud());
