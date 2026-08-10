@@ -4,6 +4,9 @@
   "package": "com.example.shiba.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "MixinPlayerEntity",
+    "MixinLivingEntity",
+    "MixinInGameOverlayRenderer",
     "MixinClientPlayerInteractionManager",
     "MixinEntityHitbox",
   ],
