@@ -86,6 +86,7 @@ public class ClickGuiScreen extends Screen {
     }
 
     private void drawTrailGlow(DrawContext context) {
+    private void drawTrailGlow(DrawContext context) {
         int size = trailPoints.size();
         if (size < 2) return;
 
@@ -97,31 +98,48 @@ public class ClickGuiScreen extends Screen {
                 com.mojang.blaze3d.platform.GlStateManager.DstFactor.ONE
         );
 
-        int startColor = 0x8B5CF6; // tim
-        int endColor = 0x22D3EE;   // xanh cyan
+        int colorA = 0xA855F7; // tim sang
+        int colorB = 0x06B6D4; // cyan dam
+        int colorC = 0xFFFFFF; // trang loi
 
-        for (int i = 0; i < size; i++) {
-            int[] pt = trailPoints.get(i);
+        // Vẽ nhiều lớp segment nối giữa các điểm để tạo hiệu ứng motion blur mượt,
+        // thay vì chỉ vẽ từng chấm rời rạc.
+        for (int i = 1; i < size; i++) {
+            int[] p0 = trailPoints.get(i - 1);
+            int[] p1 = trailPoints.get(i);
             float progress = (float) i / size;
 
-            int color = lerpColor(startColor, endColor, progress);
-            int baseAlpha = (int) (25 + 90 * progress);
-            int radius = 3 + (int) (14 * progress);
+            float dx = p1[0] - p0[0];
+            float dy = p1[1] - p0[1];
+            float dist = (float) Math.sqrt(dx * dx + dy * dy);
+            int steps = Math.max(1, (int) (dist / 2.0F));
 
-            for (int r = radius; r > 0; r--) {
-                float p = (float) r / radius;
-                int a = (int) (baseAlpha * (1 - p * p) * 0.35F);
-                if (a <= 0) continue;
-                int rgba = (a << 24) | color;
-                context.fill(pt[0] - r, pt[1] - r, pt[0] + r, pt[1] + r, rgba);
+            int color = lerpColor(colorA, colorB, progress);
+            int baseRadius = 2 + (int) (16 * progress);
+            int baseAlpha = (int) (15 + 70 * progress);
+
+            for (int s = 0; s <= steps; s++) {
+                float t = (float) s / steps;
+                int x = (int) (p0[0] + dx * t);
+                int y = (int) (p0[1] + dy * t);
+
+                for (int r = baseRadius; r > 0; r -= 2) {
+                    float p = (float) r / baseRadius;
+                    int a = (int) (baseAlpha * (1 - p * p) * 0.5F);
+                    if (a <= 0) continue;
+                    int rgba = (a << 24) | color;
+                    context.fill(x - r, y - r, x + r, y + r, rgba);
+                }
             }
         }
 
+        // Loi sang o dau con tro, phat sang manh nhat
         int[] head = trailPoints.get(size - 1);
-        for (int r = 5; r > 0; r--) {
-            float p = (float) r / 5;
-            int a = (int) (180 * (1 - p * p));
-            int rgba = (a << 24) | 0xFFFFFF;
+        for (int r = 8; r > 0; r--) {
+            float p = (float) r / 8;
+            int a = (int) (200 * (1 - p * p));
+            int color = r < 3 ? colorC : lerpColor(colorC, colorB, p);
+            int rgba = (a << 24) | color;
             context.fill(head[0] - r, head[1] - r, head[0] + r, head[1] + r, rgba);
         }
 
@@ -130,6 +148,7 @@ public class ClickGuiScreen extends Screen {
     }
 
     private int lerpColor(int colorA, int colorB, float t) {
+        t = Math.max(0, Math.min(1, t));
         int ar = (colorA >> 16) & 0xFF, ag = (colorA >> 8) & 0xFF, ab = colorA & 0xFF;
         int br = (colorB >> 16) & 0xFF, bg = (colorB >> 8) & 0xFF, bb = colorB & 0xFF;
 
