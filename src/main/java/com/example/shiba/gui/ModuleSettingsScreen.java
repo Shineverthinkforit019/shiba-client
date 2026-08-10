@@ -1,37 +1,78 @@
 package com.example.shiba.gui;
 
+import com.example.shiba.config.ConfigManager;
 import com.example.shiba.module.Module;
+import com.example.shiba.module.impl.Aura;
+import com.example.shiba.module.impl.ESP;
+import com.example.shiba.module.impl.Hitbox;
+import com.example.shiba.module.impl.Reach;
+import com.example.shiba.module.impl.TriggerBot;
+import com.example.shiba.module.impl.XrayX;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.SliderWidget;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 
 public class ModuleSettingsScreen extends Screen {
-    private final Module module;
 
-    public ModuleSettingsScreen(Module module) {
-        super(Text.literal(module.getName()));
+    private static final int PANEL_WIDTH = 220;
+    private static final int ROW_HEIGHT = 20;
+    private static final int SLIDER_HEIGHT = 18;
+    private static final int SPACING = 4;
+    private static final int PADDING = 8;
+    private static final int HEADER_HEIGHT = 26;
+
+    private static final int COLOR_PANEL_BG = 0xE6161618;
+    private static final int COLOR_PANEL_BORDER = 0xFF2A2A30;
+    private static final int COLOR_HEADER = 0xFF7C5CFF;
+
+    private final Module module;
+    private final Screen parent;
+
+    private int panelX;
+    private int panelY;
+    private int totalHeight;
+
+    private boolean awaitingKeybind = false;
+    private ButtonWidget keybindButton;
+
+    public ModuleSettingsScreen(Module module, Screen parent) {
+        super(Text.literal(module.getName() + " Settings"));
         this.module = module;
+        this.parent = parent;
     }
 
     @Override
     protected void init() {
-        super.init();
-        this.addDrawableChild(ButtonWidget.builder(Text.literal("Back"), button -> {
-            if (this.client != null) this.client.setScreen(null);
-        }).dimensions(5, 5, 50, 20).build());
-    }
+        panelX = this.width / 2 - PANEL_WIDTH / 2;
+        panelY = 30;
 
-    @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context, mouseX, mouseY, delta);
-        context.drawText(textRenderer, "Settings for: " + module.getName(), 10, 30, 0xFFFFFF, false);
-        super.render(context, mouseX, mouseY, delta);
-    }
-}
-if (module instanceof Reach reach) {
+        int y = panelY + HEADER_HEIGHT + PADDING;
+        int rowX = panelX + PADDING;
+        int rowW = PANEL_WIDTH - PADDING * 2;
+
+        if (module instanceof Hitbox hitbox) {
+            y = addSlider(y, rowX, rowW, hitbox.expand, 1.0,
+                    v -> hitbox.expand = v, v -> "Expand: " + String.format("%.2f", v));
+
+            ButtonWidget renderToggle = ButtonWidget.builder(
+                    Text.literal("Render Outline: " + (hitbox.renderOutline ? "ON" : "OFF")),
+                    btn -> {
+                        hitbox.renderOutline = !hitbox.renderOutline;
+                        btn.setMessage(Text.literal("Render Outline: " + (hitbox.renderOutline ? "ON" : "OFF")));
+                    }
+            ).dimensions(rowX, y, rowW, ROW_HEIGHT).build();
+            this.addDrawableChild(renderToggle);
+            y += ROW_HEIGHT + SPACING;
+        }
+
+        if (module instanceof Reach reach) {
             var setting = reach.range;
             double range = setting.getMax() - setting.getMin();
+
             SliderWidget reachSlider = new SliderWidget(rowX, y, rowW, SLIDER_HEIGHT, Text.literal(""),
                     (setting.getValue() - setting.getMin()) / range) {
                 {
@@ -49,4 +90,151 @@ if (module instanceof Reach reach) {
             };
             this.addDrawableChild(reachSlider);
             y += SLIDER_HEIGHT + SPACING;
+        }
+
+        if (module instanceof TriggerBot tb) {
+            y = addSlider(y, rowX, rowW, tb.fov, 60.0,
+                    v -> tb.fov = v, v -> "FOV: " + String.format("%.1f", v));
+            y = addSlider(y, rowX, rowW, tb.range, 8.0,
+                    v -> tb.range = v, v -> "Range: " + String.format("%.2f", v));
+            y = addSlider(y, rowX, rowW, tb.attackDelayTicks, 20.0,
+                    v -> tb.attackDelayTicks = v, v -> "Delay: " + String.format("%.0f ticks", v));
+
+            ButtonWidget critToggle = ButtonWidget.builder(
+                    Text.literal("Crit: " + (tb.critEnabled ? "ON" : "OFF")),
+                    btn -> {
+                        tb.critEnabled = !tb.critEnabled;
+                        btn.setMessage(Text.literal("Crit: " + (tb.critEnabled ? "ON" : "OFF")));
+                    }
+            ).dimensions(rowX, y, rowW, ROW_HEIGHT).build();
+            this.addDrawableChild(critToggle);
+            y += ROW_HEIGHT + SPACING;
+        }
+
+        if (module instanceof Aura aura) {
+            y = addSlider(y, rowX, rowW, aura.range, 8.0,
+                    v -> aura.range = v, v -> "Range: " + String.format("%.2f", v));
+
+            ButtonWidget modeToggle = ButtonWidget.builder(
+                    Text.literal("Mode: " + aura.mode.name()),
+                    btn -> {
+                        aura.toggleMode();
+                        btn.setMessage(Text.literal("Mode: " + aura.mode.name()));
+                    }
+            ).dimensions(rowX, y, rowW, ROW_HEIGHT).build();
+            this.addDrawableChild(modeToggle);
+            y += ROW_HEIGHT + SPACING;
+
+            if (aura.mode == Aura.Mode.SMOOTH) {
+                y = addSlider(y, rowX, rowW, aura.smoothness, 1.0,
+                        v -> aura.smoothness = v, v -> "Smoothness: " + String.format("%.2f", v));
+            } else {
+                y = addSlider(y, rowX, rowW, aura.rotationSpeed, 360.0,
+                        v -> aura.rotationSpeed = v, v -> "Speed: " + String.format("%.0f", v));
+            }
+
+            y = addSlider(y, rowX, rowW, aura.attackDelayTicks, 20.0,
+                    v -> aura.attackDelayTicks = v, v -> "Delay: " + String.format("%.0f ticks", v));
+        }
+
+        if (module instanceof ESP esp) {
+            y = addSlider(y, rowX, rowW, esp.range, 5000.0,
+                    v -> esp.range = v, v -> "Range: " + String.format("%.0f", v));
+        }
+
+        if (module instanceof XrayX xray) {
+            y = addSlider(y, rowX, rowW, xray.range, 64.0,
+                    v -> xray.range = (int) v, v -> "Range: " + String.format("%.0f", v));
+            y = addSlider(y, rowX, rowW, xray.rescanIntervalTicks, 100.0,
+                    v -> xray.rescanIntervalTicks = (int) v, v -> "Rescan: " + String.format("%.0f ticks", v));
+        }
+
+        keybindButton = ButtonWidget.builder(
+                keybindLabel(),
+                btn -> {
+                    awaitingKeybind = true;
+                    btn.setMessage(Text.literal("Press a key..."));
+                }
+        ).dimensions(rowX, y, rowW, ROW_HEIGHT).build();
+        this.addDrawableChild(keybindButton);
+        y += ROW_HEIGHT + SPACING;
+
+        ButtonWidget backButton = ButtonWidget.builder(
+                Text.literal("Back"),
+                btn -> this.close()
+        ).dimensions(rowX, y, rowW, ROW_HEIGHT).build();
+        this.addDrawableChild(backButton);
+        y += ROW_HEIGHT + SPACING;
+
+        totalHeight = y - panelY;
+    }
+
+    private Text keybindLabel() {
+        if (module.getKeybind() == 0) return Text.literal("Keybind: None");
+        String keyName = InputUtil.fromKeyCode(module.getKeybind(), 0).getLocalizedText().getString();
+        return Text.literal("Keybind: " + keyName);
+    }
+
+    private int addSlider(int y, int rowX, int rowW, double current, double max,
+                           java.util.function.DoubleConsumer setter,
+                           java.util.function.DoubleFunction<String> label) {
+        SliderWidget slider = new SliderWidget(rowX, y, rowW, SLIDER_HEIGHT, Text.literal(""), current / max) {
+            {
+                setMessage(Text.literal(label.apply(current)));
+            }
+            @Override
+            protected void updateMessage() {
+                this.setMessage(Text.literal(label.apply(this.value * max)));
+            }
+            @Override
+            protected void applyValue() {
+                setter.accept(this.value * max);
+            }
+        };
+        this.addDrawableChild(slider);
+        return y + SLIDER_HEIGHT + SPACING;
+    }
+
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        context.fill(panelX - 1, panelY - 1, panelX + PANEL_WIDTH + 1, panelY + totalHeight + 1, COLOR_PANEL_BORDER);
+        context.fill(panelX, panelY, panelX + PANEL_WIDTH, panelY + totalHeight, COLOR_PANEL_BG);
+        context.fill(panelX, panelY, panelX + PANEL_WIDTH, panelY + HEADER_HEIGHT, COLOR_HEADER);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title,
+                panelX + PANEL_WIDTH / 2, panelY + 8, 0xFFFFFFFF);
+
+        super.render(context, mouseX, mouseY, delta);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (awaitingKeybind) {
+            if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+                module.setKeybind(0);
+            } else {
+                module.setKeybind(keyCode);
+            }
+            awaitingKeybind = false;
+            keybindButton.setMessage(keybindLabel());
+            return true;
+        }
+
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+            this.close();
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public void close() {
+        if (this.client != null) {
+            this.client.setScreen(parent);
+        }
+    }
+
+    @Override
+    public boolean shouldPause() {
+        return false;
+    }
 }
