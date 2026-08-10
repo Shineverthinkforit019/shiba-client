@@ -18,7 +18,6 @@ import com.example.shiba.module.impl.FpsHud;
 import com.example.shiba.module.impl.Hitbox;
 import com.example.shiba.module.impl.HitboxBV;
 import com.example.shiba.module.impl.MaceX;
-import com.example.shiba.module.impl.Reach;
 import com.example.shiba.module.impl.TriggerBot;
 import com.example.shiba.module.impl.WTap;
 import com.example.shiba.module.impl.Zoom;
@@ -41,7 +40,6 @@ public final class ModuleManager {
     public static final FpsHud FPS = register(new FpsHud());
     public static final Zoom ZOOM = register(new Zoom());
     public static final Hitbox HITBOX = register(new Hitbox());
-    public static final Reach REACH = register(new Reach());
     public static final TriggerBot TRIGGERBOT = register(new TriggerBot());
     public static final ESP ESP = register(new ESP());
     public static final Aura AURA = register(new Aura());
