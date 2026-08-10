@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-version = '1.0.83'
+version = '1.0.84'
 group = 'com.example.shiba'
 
 repositories {
@@ -18,7 +18,7 @@ dependencies {
     minecraft "com.mojang:minecraft:1.21.1"
     mappings "net.fabricmc:yarn:1.21.1+build.3:v2"
     modImplementation "net.fabricmc:fabric-loader:0.15.11"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:0.97.0+1.21.1"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.116.7+1.21.1"
 }
 
 processResources {
