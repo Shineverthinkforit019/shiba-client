@@ -56,6 +56,33 @@ public class XrayX extends Module {
 
         // Lava - cam
         ORE_COLORS.put(Blocks.LAVA, new float[]{1.0F, 0.45F, 0.0F});
+
+        // Ruong - vang sang
+        ORE_COLORS.put(Blocks.CHEST, new float[]{1.0F, 0.75F, 0.2F});
+        ORE_COLORS.put(Blocks.TRAPPED_CHEST, new float[]{1.0F, 0.75F, 0.2F});
+        ORE_COLORS.put(Blocks.ENDER_CHEST, new float[]{0.4F, 0.9F, 0.9F});
+
+        // Shulker box - tim hong
+        ORE_COLORS.put(Blocks.SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.WHITE_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.ORANGE_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.MAGENTA_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.LIGHT_BLUE_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.YELLOW_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.LIME_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.PINK_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.GRAY_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.LIGHT_GRAY_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.CYAN_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.PURPLE_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.BLUE_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.BROWN_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.GREEN_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.RED_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+        ORE_COLORS.put(Blocks.BLACK_SHULKER_BOX, new float[]{0.85F, 0.4F, 0.9F});
+
+        // Barrel
+        ORE_COLORS.put(Blocks.BARREL, new float[]{1.0F, 0.75F, 0.2F});
     }
 
     private final List<OreEntry> foundOres = new ArrayList<>();
