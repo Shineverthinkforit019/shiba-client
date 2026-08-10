@@ -29,3 +29,24 @@ public class ModuleSettingsScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
     }
 }
+if (module instanceof Reach reach) {
+            var setting = reach.range;
+            double range = setting.getMax() - setting.getMin();
+            SliderWidget reachSlider = new SliderWidget(rowX, y, rowW, SLIDER_HEIGHT, Text.literal(""),
+                    (setting.getValue() - setting.getMin()) / range) {
+                {
+                    setMessage(Text.literal("Reach: " + String.format("%.2f", setting.getValue())));
+                }
+                @Override
+                protected void updateMessage() {
+                    double v = setting.getMin() + this.value * range;
+                    this.setMessage(Text.literal("Reach: " + String.format("%.2f", v)));
+                }
+                @Override
+                protected void applyValue() {
+                    setting.setValue(setting.getMin() + this.value * range);
+                }
+            };
+            this.addDrawableChild(reachSlider);
+            y += SLIDER_HEIGHT + SPACING;
+}
