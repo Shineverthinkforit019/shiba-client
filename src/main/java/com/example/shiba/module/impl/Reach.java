@@ -11,7 +11,7 @@ public class Reach extends Module {
         super("Reach", "Tăng khoảng cách tấn công (legit)", Category.COMBAT);
     }
 
-    public float getReach() {
-        return isEnabled() ? (float) range.getValue() : 3.0f;
+    public double getReach() {
+        return isEnabled() ? range.getValue() : 3.0;
     }
 }
