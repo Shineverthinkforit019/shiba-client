@@ -88,20 +88,56 @@ public class ClickGuiScreen extends Screen {
     private void drawTrailGlow(DrawContext context) {
         int size = trailPoints.size();
         if (size < 2) return;
-        int glowColor = 0x1E90FF;
+
+        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+        com.mojang.blaze3d.systems.RenderSystem.blendFuncSeparate(
+                com.mojang.blaze3d.platform.GlStateManager.SrcFactor.SRC_ALPHA,
+                com.mojang.blaze3d.platform.GlStateManager.DstFactor.ONE,
+                com.mojang.blaze3d.platform.GlStateManager.SrcFactor.ZERO,
+                com.mojang.blaze3d.platform.GlStateManager.DstFactor.ONE
+        );
+
+        int startColor = 0x8B5CF6; // tim
+        int endColor = 0x22D3EE;   // xanh cyan
+
         for (int i = 0; i < size; i++) {
             int[] pt = trailPoints.get(i);
             float progress = (float) i / size;
-            int alpha = (int)(40 + 100 * progress);
-            int radius = 6 + (int)(22 * progress);
+
+            int color = lerpColor(startColor, endColor, progress);
+            int baseAlpha = (int) (25 + 90 * progress);
+            int radius = 3 + (int) (14 * progress);
+
             for (int r = radius; r > 0; r--) {
                 float p = (float) r / radius;
-                int a = (int)(alpha * (1 - p * p));
+                int a = (int) (baseAlpha * (1 - p * p) * 0.35F);
                 if (a <= 0) continue;
-                int color = (a << 24) | glowColor;
-                context.fill(pt[0] - r, pt[1] - r, pt[0] + r, pt[1] + r, color);
+                int rgba = (a << 24) | color;
+                context.fill(pt[0] - r, pt[1] - r, pt[0] + r, pt[1] + r, rgba);
             }
         }
+
+        int[] head = trailPoints.get(size - 1);
+        for (int r = 5; r > 0; r--) {
+            float p = (float) r / 5;
+            int a = (int) (180 * (1 - p * p));
+            int rgba = (a << 24) | 0xFFFFFF;
+            context.fill(head[0] - r, head[1] - r, head[0] + r, head[1] + r, rgba);
+        }
+
+        com.mojang.blaze3d.systems.RenderSystem.defaultBlendFunc();
+        com.mojang.blaze3d.systems.RenderSystem.disableBlend();
+    }
+
+    private int lerpColor(int colorA, int colorB, float t) {
+        int ar = (colorA >> 16) & 0xFF, ag = (colorA >> 8) & 0xFF, ab = colorA & 0xFF;
+        int br = (colorB >> 16) & 0xFF, bg = (colorB >> 8) & 0xFF, bb = colorB & 0xFF;
+
+        int r = (int) (ar + (br - ar) * t);
+        int g = (int) (ag + (bg - ag) * t);
+        int b = (int) (ab + (bb - ab) * t);
+
+        return (r << 16) | (g << 8) | b;
     }
 
     private void drawSearchBar(DrawContext context) {
