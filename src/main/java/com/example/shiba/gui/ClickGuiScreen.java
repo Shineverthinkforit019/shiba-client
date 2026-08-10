@@ -87,7 +87,6 @@ public class ClickGuiScreen extends Screen {
 
     private void drawTrailGlow(DrawContext context) {
         int size = trailPoints.size();
-        int size = trailPoints.size();
         if (size < 2) return;
 
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
