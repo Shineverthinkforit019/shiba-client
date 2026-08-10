@@ -12,6 +12,6 @@ public class HitSpeed extends Module {
     }
 
     public float getSpeed() {
-        return isEnabled() ? speed.getValue().floatValue() : 1.0f;
+        return isEnabled() ? (float) speed.getValue() : 1.0f;
     }
 }
