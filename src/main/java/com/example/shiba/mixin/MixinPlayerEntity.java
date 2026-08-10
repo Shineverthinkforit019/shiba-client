@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PlayerEntity.class)
 public class MixinPlayerEntity {
 
-    @Inject(method = "getAttackDistance", at = @At("RETURN"), cancellable = true)
-    private void shiba$overrideAttackDistance(CallbackInfoReturnable<Double> cir) {
+    @Inject(method = "getEntityInteractionRange", at = @At("RETURN"), cancellable = true)
+    private void shiba$expandReach(CallbackInfoReturnable<Double> cir) {
         PlayerEntity self = (PlayerEntity) (Object) this;
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null || self != mc.player) return;
