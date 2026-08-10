@@ -168,7 +168,7 @@ public class ClickGuiScreen extends Screen {
                 Module m = (Module) r.data();
                 if (button == 1) {
                     if (this.client != null) {
-                        this.client.setScreen(new ModuleSettingsScreen(m, this));
+                        this.client.setScreen(new ModuleSettingsScreen(m));
                     }
                 } else {
                     m.toggle();
