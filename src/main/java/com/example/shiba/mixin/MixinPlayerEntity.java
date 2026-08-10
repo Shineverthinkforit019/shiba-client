@@ -13,10 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PlayerEntity.class)
 public class MixinPlayerEntity {
 
-    @Inject(method = "getEntityInteractionRange", at = @At("RETURN"), cancellable = true)
-    private void shiba$expandReach(CallbackInfoReturnable<Double> cir) {
+    @Inject(method = "getAttackDistance", at = @At("RETURN"), cancellable = true)
+    private void shiba$overrideAttackDistance(CallbackInfoReturnable<Double> cir) {
         PlayerEntity self = (PlayerEntity) (Object) this;
-
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null || self != mc.player) return;
 
@@ -29,7 +28,6 @@ public class MixinPlayerEntity {
     @Inject(method = "getAttackCooldownProgress", at = @At("RETURN"), cancellable = true)
     private void shiba$overrideCooldown(float baseTime, CallbackInfoReturnable<Float> cir) {
         PlayerEntity self = (PlayerEntity) (Object) this;
-
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null || self != mc.player) return;
 
@@ -37,10 +35,8 @@ public class MixinPlayerEntity {
         if (hitSpeed == null || !hitSpeed.isEnabled()) return;
 
         float multiplier = hitSpeed.getCooldownMultiplier();
-        if (multiplier >= 1.0F) return;
-
         float original = cir.getReturnValue();
-        float boosted = Math.min(1.0F, original + (1.0F - multiplier));
+        float boosted = Math.min(1.0f, original + (1.0f - multiplier));
         cir.setReturnValue(boosted);
     }
 }
