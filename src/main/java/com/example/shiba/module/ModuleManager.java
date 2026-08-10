@@ -1,5 +1,6 @@
 package com.example.shiba.module;
 
+import net.minecraft.client.MinecraftClient;
 import com.example.shiba.module.impl.Reach;
 import com.example.shiba.module.impl.Velocity;
 import com.example.shiba.module.impl.HitSpeed;
@@ -28,6 +29,7 @@ import java.util.List;
 public final class ModuleManager {
     private static final List<Module> MODULES = new ArrayList<>();
 
+    public static MinecraftClient mc = MinecraftClient.getInstance();
     public static final Reach REACH = register(new Reach());
     public static final Velocity VELOCITY = register(new Velocity());
     public static final HitSpeed HITSPEED = register(new HitSpeed());
