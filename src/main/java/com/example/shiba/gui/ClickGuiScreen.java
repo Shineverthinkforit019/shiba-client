@@ -49,7 +49,7 @@ public class ClickGuiScreen extends Screen {
     private record Rect(int x, int y, int w, int h, Object data) {}
 
     public ClickGuiScreen() {
-        super(Text.literal(ShibaClient.MOD_NAME));
+        super(Text.literal("Shiba Client"));
     }
 
     @Override
