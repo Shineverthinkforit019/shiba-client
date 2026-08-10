@@ -12,6 +12,6 @@ public class Reach extends Module {
     }
 
     public float getReach() {
-        return isEnabled() ? range.getValue().floatValue() : 3.0f;
+        return isEnabled() ? (float) range.getValue() : 3.0f;
     }
 }
