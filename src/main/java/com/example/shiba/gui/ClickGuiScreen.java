@@ -91,12 +91,16 @@ public class ClickGuiScreen extends Screen {
     }
 
     private String categoryLabel(Category c) {
-        return switch (c) {
-            case COMBAT -> "PVP";
-            case MOVEMENT -> "Move";
-            case RENDER -> "Render";
-            case HUD -> "HUD";
-        };
+    return switch (c) {
+        case COMBAT -> "Combat";
+        case MOVEMENT -> "Movement";
+        case PLAYER -> "Player";
+        case VISUAL -> "Visual";
+        case RENDER -> "Render";
+        case HUD -> "HUD";
+        case MISC -> "Misc";
+        default -> "Unknown";
+    };
     }
 
     private Text labelFor(Module module) {
