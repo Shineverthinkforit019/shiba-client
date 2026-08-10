@@ -4,25 +4,22 @@ import com.example.shiba.module.ModuleManager;
 import com.example.shiba.module.impl.Reach;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(ClientPlayerInteractionManager.class)
 public class MixinClientPlayerInteractionManager {
 
-    @Inject(method = "attackEntity", at = @At("HEAD"), cancellable = false)
-    private void onAttackEntity(PlayerEntity player, Entity target, CallbackInfo ci) {
+    @ModifyVariable(method = "attackEntity", at = @At("HEAD"), argsOnly = true, ordinal = 0)
+    private Entity modifyAttackTarget(Entity target) {
         Reach reach = ModuleManager.REACH;
         if (reach != null && reach.isEnabled()) {
-            // Kiểm tra khoảng cách với Reach mới
-            double reachDistance = reach.getReach();
-            if (player.distanceTo(target) > reachDistance) {
-                // Nếu quá xa, không đánh (có thể hủy hoặc bỏ qua)
-                // Có thể thêm logic để hủy nếu cần
+            // Nếu target xa hơn reach, trả về null để không đánh
+            if (ModuleManager.mc.player.distanceTo(target) > reach.getReach()) {
+                return null;
             }
         }
+        return target;
     }
 }
