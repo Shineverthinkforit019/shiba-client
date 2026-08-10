@@ -13,10 +13,10 @@ public class Velocity extends Module {
     }
 
     public float getHorizontal() {
-        return isEnabled() ? horizontal.getValue().floatValue() / 100f : 1.0f;
+        return isEnabled() ? (float) (horizontal.getValue() / 100.0) : 1.0f;
     }
 
     public float getVertical() {
-        return isEnabled() ? vertical.getValue().floatValue() / 100f : 1.0f;
+        return isEnabled() ? (float) (vertical.getValue() / 100.0) : 1.0f;
     }
 }
