@@ -2,16 +2,24 @@
   "schemaVersion": 1,
   "id": "shiba",
   "version": "${version}",
-  "name": "Shiba",
-  "description": "Mod tien ich client-side cho Minecraft 1.21.11",
-  "environment": "client",
+  "name": "Shiba Client",
+  "description": "Minecraft Utility Mod",
+  "authors": ["YourName"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/shiba/icon.png",
+  "environment": "*",
   "entrypoints": {
-    "client": ["com.example.shiba.ShibaClient"]
+    "client": [
+      "com.example.shiba.ShibaClient"
+    ]
   },
-  "mixins": ["shiba.mixins.json"],
+  "mixins": [
+    "shiba.mixins.json"
+  ],
   "depends": {
-    "fabricloader": ">=0.16.5",
-    "minecraft": "~1.21.11",
+    "fabricloader": ">=0.15.0",
+    "minecraft": ">=1.21.1",
     "java": ">=21",
     "fabric-api": "*"
   }
