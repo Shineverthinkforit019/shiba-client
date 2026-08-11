@@ -18,7 +18,12 @@ public class MixinPlayerEntity {
         PlayerEntity self = (PlayerEntity) (Object) this;
 
         MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.player == null || self != mc.player) return;
+        if (mc.player == null) return;
+
+        // So sanh theo UUID thay vi tham chieu object, de fix ap dung cho ca
+        // ban server tich hop - neu khong sua, client cho phep click nhung
+        // server van tinh theo tam 3.0 goc, dan toi "hien thi nhung khong ra dame".
+        if (!self.getUuid().equals(mc.player.getUuid())) return;
 
         Reach reach = ModuleManager.REACH;
         if (reach == null || !reach.isEnabled()) return;
