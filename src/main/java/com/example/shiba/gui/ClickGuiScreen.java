@@ -89,6 +89,9 @@ public class ClickGuiScreen extends Screen {
         int size = trailPoints.size();
         if (size < 2) return;
 
+        var matrix = context.getMatrices().peek().getPositionMatrix();
+
+        com.mojang.blaze3d.systems.RenderSystem.setShader(net.minecraft.client.render.GameRenderer::getPositionColorProgram);
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         com.mojang.blaze3d.systems.RenderSystem.blendFuncSeparate(
                 com.mojang.blaze3d.platform.GlStateManager.SrcFactor.SRC_ALPHA,
@@ -96,13 +99,19 @@ public class ClickGuiScreen extends Screen {
                 com.mojang.blaze3d.platform.GlStateManager.SrcFactor.ZERO,
                 com.mojang.blaze3d.platform.GlStateManager.DstFactor.ONE
         );
+        com.mojang.blaze3d.systems.RenderSystem.disableCull();
+        com.mojang.blaze3d.systems.RenderSystem.depthMask(false);
 
-        int colorA = 0xA855F7; // tim sang
-        int colorB = 0x06B6D4; // cyan dam
-        int colorC = 0xFFFFFF; // trang loi
+        int colorA = 0xA855F7;
+        int colorB = 0x22D3EE;
 
-        // Vẽ nhiều lớp segment nối giữa các điểm để tạo hiệu ứng motion blur mượt,
-        // thay vì chỉ vẽ từng chấm rời rạc.
+        var tessellator = net.minecraft.client.render.Tessellator.getInstance();
+        var buffer = tessellator.begin(
+                net.minecraft.client.render.VertexFormat.DrawMode.QUADS,
+                net.minecraft.client.render.VertexFormats.POSITION_COLOR
+        );
+
+        // Ve than duoi: 1 lop quad rong theo huong di chuyen, cong dong sang additive
         for (int i = 1; i < size; i++) {
             int[] p0 = trailPoints.get(i - 1);
             int[] p1 = trailPoints.get(i);
@@ -110,40 +119,68 @@ public class ClickGuiScreen extends Screen {
 
             float dx = p1[0] - p0[0];
             float dy = p1[1] - p0[1];
-            float dist = (float) Math.sqrt(dx * dx + dy * dy);
-            int steps = Math.max(1, (int) (dist / 2.0F));
+            float len = (float) Math.sqrt(dx * dx + dy * dy);
+            if (len < 0.001F) continue;
+
+            float nx = -dy / len;
+            float ny = dx / len;
+
+            float widthStart = 1.0F + 9.0F * ((float) (i - 1) / size);
+            float widthEnd = 1.0F + 9.0F * progress;
 
             int color = lerpColor(colorA, colorB, progress);
-            int baseRadius = 2 + (int) (16 * progress);
-            int baseAlpha = (int) (15 + 70 * progress);
+            int alpha = (int) (60 + 130 * progress);
 
-            for (int s = 0; s <= steps; s++) {
-                float t = (float) s / steps;
-                int x = (int) (p0[0] + dx * t);
-                int y = (int) (p0[1] + dy * t);
+            float ox0 = nx * widthStart, oy0 = ny * widthStart;
+            float ox1 = nx * widthEnd, oy1 = ny * widthEnd;
 
-                for (int r = baseRadius; r > 0; r -= 2) {
-                    float p = (float) r / baseRadius;
-                    int a = (int) (baseAlpha * (1 - p * p) * 0.5F);
-                    if (a <= 0) continue;
-                    int rgba = (a << 24) | color;
-                    context.fill(x - r, y - r, x + r, y + r, rgba);
-                }
-            }
+            addQuad(buffer, matrix,
+                    p0[0] - ox0, p0[1] - oy0,
+                    p0[0] + ox0, p0[1] + oy0,
+                    p1[0] + ox1, p1[1] + oy1,
+                    p1[0] - ox1, p1[1] - oy1,
+                    color, alpha);
         }
 
-        // Loi sang o dau con tro, phat sang manh nhat
+        tessellator.draw();
+
+        // Loi sang o dau con tro: vai lop quad vuong nho dan, khong dung vong lap pixel
         int[] head = trailPoints.get(size - 1);
-        for (int r = 8; r > 0; r--) {
-            float p = (float) r / 8;
-            int a = (int) (200 * (1 - p * p));
-            int color = r < 3 ? colorC : lerpColor(colorC, colorB, p);
-            int rgba = (a << 24) | color;
-            context.fill(head[0] - r, head[1] - r, head[0] + r, head[1] + r, rgba);
+        buffer = tessellator.begin(
+                net.minecraft.client.render.VertexFormat.DrawMode.QUADS,
+                net.minecraft.client.render.VertexFormats.POSITION_COLOR
+        );
+
+        int[] headSizes = {14, 9, 5, 2};
+        int[] headAlphas = {40, 80, 140, 220};
+        int[] headColors = {colorB, lerpColor(colorB, colorA, 0.5F), colorA, 0xFFFFFF};
+
+        for (int i = 0; i < headSizes.length; i++) {
+            int r = headSizes[i];
+            addQuad(buffer, matrix,
+                    head[0] - r, head[1] - r,
+                    head[0] + r, head[1] - r,
+                    head[0] + r, head[1] + r,
+                    head[0] - r, head[1] + r,
+                    headColors[i], headAlphas[i]);
         }
 
+        tessellator.draw();
+
+        com.mojang.blaze3d.systems.RenderSystem.depthMask(true);
+        com.mojang.blaze3d.systems.RenderSystem.enableCull();
         com.mojang.blaze3d.systems.RenderSystem.defaultBlendFunc();
         com.mojang.blaze3d.systems.RenderSystem.disableBlend();
+    }
+
+    private void addQuad(net.minecraft.client.render.BufferBuilder buffer, org.joml.Matrix4f matrix,
+                          float x0, float y0, float x1, float y1,
+                          float x2, float y2, float x3, float y3,
+                          int color, int alpha) {
+        buffer.vertex(matrix, x0, y0, 0).color((color >> 16 & 0xFF), (color >> 8 & 0xFF), (color & 0xFF), alpha);
+        buffer.vertex(matrix, x1, y1, 0).color((color >> 16 & 0xFF), (color >> 8 & 0xFF), (color & 0xFF), alpha);
+        buffer.vertex(matrix, x2, y2, 0).color((color >> 16 & 0xFF), (color >> 8 & 0xFF), (color & 0xFF), alpha);
+        buffer.vertex(matrix, x3, y3, 0).color((color >> 16 & 0xFF), (color >> 8 & 0xFF), (color & 0xFF), alpha);
     }
 
     private int lerpColor(int colorA, int colorB, float t) {
@@ -157,7 +194,6 @@ public class ClickGuiScreen extends Screen {
 
         return (r << 16) | (g << 8) | b;
     }
-
     private void drawSearchBar(DrawContext context) {
         this.searchBox.render(context, mouseX, mouseY, 0);
     }
