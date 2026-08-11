@@ -20,9 +20,6 @@ public class MixinPlayerEntity {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null) return;
 
-        // So sanh theo UUID thay vi tham chieu object, de fix ap dung cho ca
-        // ban server tich hop - neu khong sua, client cho phep click nhung
-        // server van tinh theo tam 3.0 goc, dan toi "hien thi nhung khong ra dame".
         if (!self.getUuid().equals(mc.player.getUuid())) return;
 
         Reach reach = ModuleManager.REACH;
@@ -38,8 +35,6 @@ public class MixinPlayerEntity {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null) return;
 
-        // So sanh theo UUID thay vi tham chieu object, de ap dung cho ca
-        // ban server tich hop (chi hoat dong tren singleplayer/server tu host chung tien trinh).
         if (!self.getUuid().equals(mc.player.getUuid())) return;
 
         HitSpeed hitSpeed = ModuleManager.HITSPEED;
@@ -48,8 +43,6 @@ public class MixinPlayerEntity {
         float multiplier = hitSpeed.getCooldownMultiplier();
         if (multiplier >= 1.0F) return;
 
-        // multiplier = 0.0 -> cooldown gan nhu bang khong (day nhanh gan len 1.0)
-        // multiplier = 1.0 -> giu nguyen cooldown vanilla
         float original = cir.getReturnValue();
         float boosted = Math.min(1.0F, original + (1.0F - multiplier));
         cir.setReturnValue(boosted);
