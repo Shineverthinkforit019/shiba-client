@@ -7,6 +7,7 @@
     "MixinPlayerEntity",
     "MixinClientPlayerInteractionManager",
     "MixinEntityHitbox",
+    "MixinAttackSafety"
   ],
   "client": [],
   "server": [],
