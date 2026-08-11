@@ -27,7 +27,7 @@ public class MixinPlayerEntity {
     }
 
     @Inject(method = "getAttackCooldownProgress", at = @At("RETURN"), cancellable = true)
-    private void shiba$removeCooldown(float baseTime, CallbackInfoReturnable<Float> cir) {
+    private void shiba$overrideCooldown(float baseTime, CallbackInfoReturnable<Float> cir) {
         PlayerEntity self = (PlayerEntity) (Object) this;
 
         MinecraftClient mc = MinecraftClient.getInstance();
@@ -40,6 +40,13 @@ public class MixinPlayerEntity {
         HitSpeed hitSpeed = ModuleManager.HITSPEED;
         if (hitSpeed == null || !hitSpeed.isEnabled()) return;
 
-        cir.setReturnValue(1.0F);
+        float multiplier = hitSpeed.getCooldownMultiplier();
+        if (multiplier >= 1.0F) return;
+
+        // multiplier = 0.0 -> cooldown gan nhu bang khong (day nhanh gan len 1.0)
+        // multiplier = 1.0 -> giu nguyen cooldown vanilla
+        float original = cir.getReturnValue();
+        float boosted = Math.min(1.0F, original + (1.0F - multiplier));
+        cir.setReturnValue(boosted);
     }
 }
