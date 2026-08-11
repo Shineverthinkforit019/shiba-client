@@ -111,6 +111,8 @@ public class ClickGuiScreen extends Screen {
                 net.minecraft.client.render.VertexFormats.POSITION_COLOR
         );
 
+        boolean bodyHasVertex = false;
+
         // Ve than duoi: 1 lop quad rong theo huong di chuyen, cong dong sang additive
         for (int i = 1; i < size; i++) {
             int[] p0 = trailPoints.get(i - 1);
@@ -140,10 +142,12 @@ public class ClickGuiScreen extends Screen {
                     p1[0] + ox1, p1[1] + oy1,
                     p1[0] - ox1, p1[1] - oy1,
                     color, alpha);
+            bodyHasVertex = true;
         }
 
-        net.minecraft.client.render.BufferRenderer.drawWithGlobalProgram(buffer.end());
-
+        if (bodyHasVertex) {
+            net.minecraft.client.render.BufferRenderer.drawWithGlobalProgram(buffer.end());
+        }
         int[] head = trailPoints.get(size - 1);
         buffer = tessellator.begin(
                 net.minecraft.client.render.VertexFormat.DrawMode.QUADS,
