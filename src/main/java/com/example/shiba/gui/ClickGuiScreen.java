@@ -142,9 +142,8 @@ public class ClickGuiScreen extends Screen {
                     color, alpha);
         }
 
-        tessellator.draw();
+        net.minecraft.client.render.BufferRenderer.drawWithGlobalProgram(buffer.end());
 
-        // Loi sang o dau con tro: vai lop quad vuong nho dan, khong dung vong lap pixel
         int[] head = trailPoints.get(size - 1);
         buffer = tessellator.begin(
                 net.minecraft.client.render.VertexFormat.DrawMode.QUADS,
@@ -165,7 +164,7 @@ public class ClickGuiScreen extends Screen {
                     headColors[i], headAlphas[i]);
         }
 
-        tessellator.draw();
+        net.minecraft.client.render.BufferRenderer.drawWithGlobalProgram(buffer.end());
 
         com.mojang.blaze3d.systems.RenderSystem.depthMask(true);
         com.mojang.blaze3d.systems.RenderSystem.enableCull();
